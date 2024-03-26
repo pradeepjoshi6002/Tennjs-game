@@ -18,25 +18,61 @@ const PADDLE_OFFSET = 10;
 let leftPaddleTop = 10;
 let rightPaddleTop = 30;
 
+document.addEventListener("mousemove", (e) => {
+  rightPaddleTop = e.y - canvas.offsetTop;
+});
+
 function update() {
-  checkCollison();
+  checkCollision();
   ballPosition.x += xSpeed;
   ballPosition.y += ySpeed;
 }
-function checkCollison() {
+function checkPaddleCollision(ball, paddle) {
+  return (
+    ball.left < paddle.right &&
+    ball.right > paddle.left &&
+    ball.top < paddle.bottom &&
+    ball.bottom > paddle.top
+  );
+}
+function checkCollision() {
   let ball = {
     left: ballPosition.x,
     right: ballPosition.x + BALL_SIZE,
     top: ballPosition.y,
     bottom: ballPosition.y + BALL_SIZE,
   };
+
+  let leftPaddle = {
+    left: PADDLE_OFFSET,
+    right: PADDLE_OFFSET + PADDLE_WIDTH,
+    top: leftPaddleTop,
+    bottom: leftPaddleTop + PADDLE_HEIGHT,
+  };
+  let rightPaddle = {
+    left: width - PADDLE_OFFSET - PADDLE_WIDTH,
+    right: width - PADDLE_OFFSET,
+    top: rightPaddleTop,
+    bottom: rightPaddleTop + PADDLE_HEIGHT,
+  };
+
   if (ball.left < 0 || ball.right > width) {
     xSpeed = -xSpeed;
   }
   if (ball.top < 0 || ball.bottom > height) {
     ySpeed = -ySpeed;
   }
+  if (checkPaddleCollision(ball, leftPaddle)) {
+    // Left paddle collision happened
+    xSpeed = Math.abs(xSpeed);
+  }
+
+  if (checkPaddleCollision(ball, rightPaddle)) {
+    // Right paddle collision happened
+    xSpeed = -Math.abs(xSpeed);
+  }
 }
+
 function draw() {
   //draw playing area
   ctx.fillStyle = "black";
